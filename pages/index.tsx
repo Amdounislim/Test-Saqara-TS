@@ -2,21 +2,47 @@ import React, { ReactElement, useState } from "react";
 import { GetStaticProps } from "next";
 import Layout from "../components/Layout";
 import { IPokemon } from "../utils/types/pokemon";
+import PokemonCard from "../components/PokemonCard";
 
 export default function Home({
-  pokemon: pokemonFromProps,
+  initialPokemon: pokemonFromProps,
 }: {
-  pokemon: IPokemon[];
+  initialPokemon: IPokemon;
 }): ReactElement {
-  const [pokemon, setPokemon] = useState<IPokemon[]>(pokemonFromProps);
+  const [pokemon, setPokemon] = useState<IPokemon>(pokemonFromProps);
+  const [offset, setOffet] = useState<number>(0);
 
-  console.log(pokemon);
+  const fetchPokemon: any = async (url: any, next: boolean) => {
+    const response = await fetch(url);
+    const nextPokemon = await response.json();
+
+    setOffet(next ? offset + 20 : offset - 20);
+    setPokemon(nextPokemon);
+  };
+
   return (
     <Layout title="PokeDex">
-      <div>
-        {pokemon.map((el, index) => (
-          <h3 key={index} >{el.name}</h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-10">
+        {pokemon.results.map((pok, index) => (
+          <PokemonCard key={index} pokemon={pok} index={index + offset} />
         ))}
+      </div>
+
+      <div className="mt-10 flex justify-center gap-5">
+        <button
+          disabled={!pokemon.previous}
+          className="disabled:bg-gray-500 px-3 py-1 bg-slate-900"
+          onClick={() => fetchPokemon(pokemon.previous, false)}
+        >
+          prev
+        </button>
+        <button
+          disabled={!pokemon.next}
+          className="disabled:bg-gray-500 px-3 py-1 bg-slate-900"
+          onClick={() => fetchPokemon(pokemon.next, true)}
+        >
+          next
+        </button>
       </div>
     </Layout>
   );
@@ -25,16 +51,16 @@ export default function Home({
 export const getStaticProps: GetStaticProps = async (context) => {
   try {
     const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-    const { results } = await res.json();
+    const initialPokemon = await res.json();
 
     return {
       props: {
-        pokemon: results,
+        initialPokemon: initialPokemon,
       },
     };
   } catch (err) {
     return {
-      props: { pokemon: [] },
+      props: { initialPokemon: {} },
     };
   }
 };

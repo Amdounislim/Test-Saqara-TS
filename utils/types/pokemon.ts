@@ -1,6 +1,6 @@
 export interface IPokemon {
-    name: string
-    url: string
-    imageUrl: string
-    pokeIndex: number
+count: number
+next: string
+previous: null
+results:[]
 }
