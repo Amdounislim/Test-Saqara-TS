@@ -48,7 +48,7 @@ export default function Home({
   );
 }
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getStaticProps: GetStaticProps = async (context:any) => {
   try {
     const res = await fetch("https://pokeapi.co/api/v2/pokemon");
     const initialPokemon = await res.json();
@@ -65,31 +65,3 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 };
 
-// export const getStaticProps: GetStaticProps = async (context) => {
-//     // eslint-disable-next-line @typescript-eslint/no-var-requires
-//     const { InMemoryLRUCache } = require('apollo-server-caching')
-//     const pokeAPI = new PokeAPI()
-//     pokeAPI.initialize({ context, cache: new InMemoryLRUCache() })
-//     const apolloClient = initializeApollo(null, { dataSources: { pokeAPI } })
-
-//     interface PokemonQueryResult {
-//       pokemon: IPokemon[]
-//     }
-
-//     try {
-//       const { data } = await apolloClient.query<PokemonQueryResult, null>({
-//         query: PokemonQuery,
-//       })
-
-//       return {
-//         props: {
-//           initialApolloState: apolloClient.cache.extract(),
-//           pokemon: data.pokemon,
-//         },
-//       }
-//     } catch (err) {
-//       return {
-//         props: { pokemon: [] },
-//       }
-//     }
-//   }
