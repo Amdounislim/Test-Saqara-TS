@@ -1,8 +1,11 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useState, useEffect } from "react";
 import { GetStaticProps } from "next";
 import Layout from "../components/Layout";
 import { IPokemon } from "../utils/types/pokemon";
 import PokemonCard from "../components/PokemonCard";
+import client from "../utils/sources/apollo-client";
+import { gql } from "@apollo/client";
+import Search from "../components/Search";
 
 export default function Home({
   initialPokemon: pokemonFromProps,
@@ -11,35 +14,46 @@ export default function Home({
 }): ReactElement {
   const [pokemon, setPokemon] = useState<IPokemon>(pokemonFromProps);
   const [offset, setOffet] = useState<number>(0);
+  // const [next, setNext] = useState<boolean>(true);
 
-  const fetchPokemon: any = async (url: any, next: boolean) => {
-    const response = await fetch(url);
-    const nextPokemon = await response.json();
-
-    setOffet(next ? offset + 20 : offset - 20);
-    setPokemon(nextPokemon);
+  const fetchPokemon: any = async () => {
+    const { data } = await client.query({
+      query: gql`
+      query MyQuery {
+        pokemon_v2_pokemon(limit: 20, offset: ${offset}) {
+          id
+          name
+        }
+      }
+      `,
+    });
+    setPokemon(data);
   };
+
+  useEffect(() => {
+    fetchPokemon();
+  }, [offset]);
 
   return (
     <Layout title="PokeDex">
+      <Search />
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-10">
-        {pokemon.results.map((pok, index) => (
+        {pokemon.pokemon_v2_pokemon.map((pok, index) => (
           <PokemonCard key={index} pokemon={pok} index={index + offset} />
         ))}
       </div>
 
       <div className="mt-10 flex justify-center gap-5">
         <button
-          disabled={!pokemon.previous}
+          disabled={offset <= 0}
           className="disabled:bg-gray-500 px-3 py-1 bg-slate-900"
-          onClick={() => fetchPokemon(pokemon.previous, false)}
+          onClick={() => setOffet(offset - 20)}
         >
           prev
         </button>
         <button
-          disabled={!pokemon.next}
           className="disabled:bg-gray-500 px-3 py-1 bg-slate-900"
-          onClick={() => fetchPokemon(pokemon.next, true)}
+          onClick={() => setOffet(offset + 20)}
         >
           next
         </button>
@@ -48,14 +62,22 @@ export default function Home({
   );
 }
 
-export const getStaticProps: GetStaticProps = async (context:any) => {
+export const getStaticProps: GetStaticProps = async (context: any) => {
   try {
-    const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-    const initialPokemon = await res.json();
+    const { data } = await client.query({
+      query: gql`
+        query MyQuery {
+          pokemon_v2_pokemon(limit: 20, offset: 0) {
+            id
+            name
+          }
+        }
+      `,
+    });
 
     return {
       props: {
-        initialPokemon: initialPokemon,
+        initialPokemon: data,
       },
     };
   } catch (err) {
@@ -64,4 +86,3 @@ export const getStaticProps: GetStaticProps = async (context:any) => {
     };
   }
 };
-
