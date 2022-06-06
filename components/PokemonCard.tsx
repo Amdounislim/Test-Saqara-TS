@@ -4,15 +4,13 @@ import Image from "next/image";
 import { PokemonEx } from "../utils/types/pokemonEx";
 
 interface PokemonCardProps {
-  pokemon: PokemonEx;
-  index: number;
+  pokemon: PokemonEx
 }
 
 export default function PokemonCard({
-  pokemon,
-  index,
+  pokemon
 }: PokemonCardProps): ReactElement {
-  const pokemonIndex: string = ("000" + (index + 1)).slice(-3);
+  const pokemonIndex: string = ("000" + (pokemon.id)).slice(-3);
 
   return (
     <Link href={`/pokemon/${pokemon.name}`}>

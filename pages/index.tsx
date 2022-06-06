@@ -14,7 +14,7 @@ export default function Home({
 }): ReactElement {
   const [pokemon, setPokemon] = useState<IPokemon>(pokemonFromProps);
   const [offset, setOffet] = useState<number>(0);
-  // const [next, setNext] = useState<boolean>(true);
+  const [next, setNext] = useState<boolean>(true);
 
   const fetchPokemon: any = async () => {
     const { data } = await client.query({
@@ -30,28 +30,50 @@ export default function Home({
     setPokemon(data);
   };
 
+  const filterPokemon: any = async (name: string) => {
+    if (name) {
+      const { data } = await client.query({
+        query: gql`
+        query MyQuery {
+          pokemon_v2_pokemon(where: {name: {_eq: ${name.toLowerCase()}}}) {
+            name
+            id
+          }
+        }
+        `,
+      });
+      setPokemon(data);
+      setNext(false);
+    } else {
+      setPokemon(pokemonFromProps);
+      setNext(true);
+      setOffet(0)
+    }
+  };
+
   useEffect(() => {
     fetchPokemon();
   }, [offset]);
 
   return (
     <Layout title="PokeDex">
-      <Search />
+      <Search filterPokemon={filterPokemon} />
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-10">
         {pokemon.pokemon_v2_pokemon.map((pok, index) => (
-          <PokemonCard key={index} pokemon={pok} index={index + offset} />
+          <PokemonCard key={index} pokemon={pok} />
         ))}
       </div>
 
       <div className="mt-10 flex justify-center gap-5">
         <button
-          disabled={offset <= 0}
+          disabled={offset <= 0 || !next}
           className="disabled:bg-gray-500 px-3 py-1 bg-slate-900"
           onClick={() => setOffet(offset - 20)}
         >
           prev
         </button>
         <button
+          disabled={!next}
           className="disabled:bg-gray-500 px-3 py-1 bg-slate-900"
           onClick={() => setOffet(offset + 20)}
         >
