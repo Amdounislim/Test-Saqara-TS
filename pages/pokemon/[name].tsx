@@ -10,10 +10,15 @@ interface PokemonProps {
 }
 
 export default function Pokemon({ pokemon }: PokemonProps): ReactElement {
+
+  // Convert the format of the id of each pokemon to be compatible with path 
   const pokeIndex: string = ("000" + pokemon.id).slice(-3);
+
+  // Change the format name of pokemon ( Camel case )
   const pokeName: string =
     pokemon.name[0].toUpperCase() + pokemon.name.slice(1);
 
+    // Function to render the types of pokemon
   const renderTypes = () =>
     pokemon.types.map((type, index) => (
       <li key={index} className="px-2 py-1 bg-slate-700 rounded">
@@ -21,6 +26,7 @@ export default function Pokemon({ pokemon }: PokemonProps): ReactElement {
       </li>
     ));
 
+    // Function to render the statistics of pokemon
   const renderStats = () =>
     pokemon.stats.map((stat, index) => (
       <div key={index} className="bg-slate-700 my-2 rounded p-1">
@@ -73,7 +79,7 @@ export default function Pokemon({ pokemon }: PokemonProps): ReactElement {
     </Layout>
   );
 }
-
+// Fetch details of each pokemon
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { name } = query;
   try {

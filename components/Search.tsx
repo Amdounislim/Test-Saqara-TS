@@ -10,6 +10,7 @@ export default function Search({filterPokemon}:SearchProps) {
 
   const [searchInput, setSearchInput] = useState<string>("")
 
+  // Invoque filter by name of pokemon function
   const filterd:any=(e:React.SyntheticEvent)=>{
     e.preventDefault();
     filterPokemon(searchInput)

@@ -12,10 +12,12 @@ export default function Home({
 }: {
   initialPokemon: IPokemon;
 }): ReactElement {
+  
   const [pokemon, setPokemon] = useState<IPokemon>(pokemonFromProps);
   const [offset, setOffet] = useState<number>(0);
   const [next, setNext] = useState<boolean>(true);
 
+  // Function pagination of the list of pokemons
   const fetchPokemon: any = async () => {
     const { data } = await client.query({
       query: gql`
@@ -30,6 +32,7 @@ export default function Home({
     setPokemon(data);
   };
 
+  // Create filter by name of pokemon function 
   const filterPokemon: any = async (name: string) => {
     if (name) {
       const { data } = await client.query({
@@ -53,6 +56,7 @@ export default function Home({
 
   useEffect(() => {
     fetchPokemon();
+    // eslint-disable-next-line
   }, [offset]);
 
   return (
@@ -84,6 +88,7 @@ export default function Home({
   );
 }
 
+// Fetch List of pokemons as static props
 export const getStaticProps: GetStaticProps = async (context: any) => {
   try {
     const { data } = await client.query({
