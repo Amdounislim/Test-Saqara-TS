@@ -60,7 +60,7 @@ export default function Home({
   }, [offset]);
 
   return (
-    <Layout title="PokeDexxxxx">
+    <Layout title="PokeDex">
       <Search filterPokemon={filterPokemon} />
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-10">
         {pokemon.pokemon_v2_pokemon.map((pok, index) => (
